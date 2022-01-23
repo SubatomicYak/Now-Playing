@@ -17,6 +17,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Windows.Media.Control;
 using MediaManager = Windows.Media.Control.GlobalSystemMediaTransportControlsSessionManager;
+using MediaSession = Windows.Media.Control.GlobalSystemMediaTransportControlsSession;
 using TransportManager = Windows.Media.Control.GlobalSystemMediaTransportControlsSession;
 
 
@@ -35,17 +36,35 @@ namespace NowPlaying
         // TODO: Output errors (no media session found)
         // TODO: Get this shit onto GIT
         // TODO: [BUG]: Fix when song removed from library, it doesnt update with next song.
+        MediaSession currentSession;
+        MediaManager sessionManager;
         public MainWindow()
         {
             InitializeComponent();
         }
+
+        // Minimize to system tray when application is minimized.
+        protected override void OnStateChanged(EventArgs e)
+        {
+            if (WindowState == WindowState.Minimized) this.Hide();
+            base.OnStateChanged(e);
+        }
+
+        // Minimize to system tray when application is closed.
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            // setting cancel to true will cancel the close request
+            // so the application is not closed
+            e.Cancel = true;
+            this.Hide();
+            base.OnClosing(e);
+        }
+
+        //Asyncronously gets the songs details from the w10 media manager
         private async Task<string> GetSongDetails()
         {
             try
             {
-                MediaManager sessionManager = await MediaManager.RequestAsync();
-                var currentSession = sessionManager.GetCurrentSession();
-
                 if (currentSession is object)
                 {
                     var info = await currentSession.TryGetMediaPropertiesAsync();
@@ -64,11 +83,24 @@ namespace NowPlaying
             UpdateSong();
         }
 
+        //On application load set up the media listener to detect the song being changed.
         private async void TextBlock_Loaded(object sender, RoutedEventArgs e)
         {
-            MediaManager sessionManager = await MediaManager.RequestAsync();
-            var session = sessionManager.GetCurrentSession();
-            session.MediaPropertiesChanged += (GlobalSystemMediaTransportControlsSession s, MediaPropertiesChangedEventArgs e) =>
+            sessionManager = await MediaManager.RequestAsync();
+            currentSession = sessionManager.GetCurrentSession();
+
+            System.Windows.Forms.NotifyIcon ni = new System.Windows.Forms.NotifyIcon();
+            ni.Icon = Properties.Resources.appicon;
+            ni.Visible = true;
+            ni.Text = "hello";
+            ni.DoubleClick +=
+                delegate (object sender, EventArgs args)
+                {
+                    Show();
+                    WindowState = System.Windows.WindowState.Normal;
+                };
+
+            currentSession.MediaPropertiesChanged += (GlobalSystemMediaTransportControlsSession s, MediaPropertiesChangedEventArgs e) =>
             {
                 UpdateSong();
             };

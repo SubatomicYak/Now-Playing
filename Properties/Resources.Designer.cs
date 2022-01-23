@@ -61,12 +61,12 @@ namespace NowPlaying.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
-        internal static byte[] appicon {
+        internal static System.Drawing.Icon appicon {
             get {
                 object obj = ResourceManager.GetObject("appicon", resourceCulture);
-                return ((byte[])(obj));
+                return ((System.Drawing.Icon)(obj));
             }
         }
     }
