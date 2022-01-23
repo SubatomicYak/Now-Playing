@@ -156,6 +156,7 @@ namespace NowPlaying
         }
     }
 
+    //is this even necessary still?
     public class Song : DependencyObject
     {
         public Song() { }
