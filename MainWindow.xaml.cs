@@ -31,12 +31,13 @@ namespace NowPlaying
     {
         // TODO: Toggleable text file output 📝
         // TODO: Toggleable dark mode ☀ 🌙
-        // TODO: Toggleable minimize/close to tray
+        // DONE? Toggleable minimize/close to tray
         // TODO: Get album artwork https://www.py4u.net/discuss/217991
         // TODO: Customizable text display(?)
         // TODO: Output errors (no media session found)
         // TODO: Get this shit onto GIT
         // TODO: [BUG]: Fix when song removed from library, it doesnt update with next song.
+        // TODO: Cleanup
         private MediaSession currentSession;
         private MediaManager sessionManager;
 
