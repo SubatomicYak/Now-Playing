@@ -117,6 +117,16 @@ namespace NowPlaying
             UpdateSong();
         }
 
+        private void Branding_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            var destinationurl = "https://github.com/SubatomicYak/Now-Playing";
+            var sInfo = new System.Diagnostics.ProcessStartInfo(destinationurl)
+            {
+                UseShellExecute = true,
+            };
+            System.Diagnostics.Process.Start(sInfo);
+        }
+        
         private async void UpdateSong()
         {
             var details = await GetSongDetails();

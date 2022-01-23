@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:NowPlaying"
         mc:Ignorable="d"
-        Title="Now Playing" Height="100" Width="250">
+        Title="Now Playing" Height="110" Width="250">
     <Window.DataContext>
         <local:Song/>
     </Window.DataContext>
@@ -14,6 +14,7 @@
             <ColumnDefinition Width="51*"/>
             <ColumnDefinition Width="149*"/>
         </Grid.ColumnDefinitions>
-        <TextBlock x:Name="NowPlayingText" TextWrapping="NoWrap" MouseDown="TextBlock_MouseDown" Loaded="TextBlock_Loaded" Text="{Binding SongDetails, NotifyOnSourceUpdated=True}" Margin="10,10,10,10" Grid.ColumnSpan="2" TextAlignment="Left"/>
+        <TextBlock x:Name="NowPlayingText" TextWrapping="NoWrap" MouseDown="TextBlock_MouseDown" Loaded="TextBlock_Loaded" Text="{Binding SongDetails, NotifyOnSourceUpdated=True}" Margin="10,10,10,21" Grid.ColumnSpan="2" TextAlignment="Left"/>
+        <Label Content="https://github.com/SubatomicYak/Now-Playing" MouseDown="Branding_MouseDown" Grid.ColumnSpan="2" FontSize="8" Foreground="#FFA6A6A6" Cursor="Hand" Height="21" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="250"/>
     </Grid>
 </Window>
