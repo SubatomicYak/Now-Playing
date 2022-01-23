@@ -15,6 +15,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Forms;
 using Windows.Media.Control;
 using MediaManager = Windows.Media.Control.GlobalSystemMediaTransportControlsSessionManager;
 using MediaSession = Windows.Media.Control.GlobalSystemMediaTransportControlsSession;
@@ -36,28 +37,96 @@ namespace NowPlaying
         // TODO: Output errors (no media session found)
         // TODO: Get this shit onto GIT
         // TODO: [BUG]: Fix when song removed from library, it doesnt update with next song.
-        MediaSession currentSession;
-        MediaManager sessionManager;
+        private MediaSession currentSession;
+        private MediaManager sessionManager;
+
+        private NotifyIcon ni;
+        private ContextMenuStrip contextMenu;
+        private MenuStrip menuStrip;
+
+        private Boolean close = false;
         public MainWindow()
         {
             InitializeComponent();
         }
 
-        // Minimize to system tray when application is minimized.
-        protected override void OnStateChanged(EventArgs e)
+        //On application load set up the media listener to detect the song being changed.
+        private async void TextBlock_Loaded(object sender, RoutedEventArgs e)
         {
-            if (WindowState == WindowState.Minimized) this.Hide();
-            base.OnStateChanged(e);
+            sessionManager = await MediaManager.RequestAsync();
+            currentSession = sessionManager.GetCurrentSession();
+
+            // Create Context Menu for the Notification Icon
+            this.contextMenu = new ContextMenuStrip();
+
+            ToolStripMenuItem item = new ToolStripMenuItem("Exit");
+            item.Name = "Exit";
+            item.Click += new EventHandler((obj,args)=>
+            {
+                close = true;
+                this.Close();
+            });
+            contextMenu.Items.Add(item);
+
+            ni = new System.Windows.Forms.NotifyIcon();
+            ni.Icon = Properties.Resources.appicon;
+            ni.Visible = true;
+            this.ni.Click += (object o, EventArgs e) => {
+                System.Windows.Forms.MouseEventArgs me = (System.Windows.Forms.MouseEventArgs) e;
+                if(me.Button == System.Windows.Forms.MouseButtons.Left)
+                {
+                    if(WindowState == WindowState.Minimized)
+                    {
+                        Show();
+                        WindowState = WindowState.Normal;
+                        this.Activate();
+                    } else
+                    {
+                        Show();
+                        WindowState = System.Windows.WindowState.Normal;
+                    }
+                }
+                else if(me.Button == System.Windows.Forms.MouseButtons.Right){
+                    contextMenu.Show();
+                }
+            };
+            ni.ContextMenuStrip = contextMenu;
+
+            // Create media listener
+            currentSession.MediaPropertiesChanged += (GlobalSystemMediaTransportControlsSession s, MediaPropertiesChangedEventArgs e) =>
+            {
+                UpdateSong();
+            };
+            UpdateSong();
         }
 
         // Minimize to system tray when application is closed.
         protected override void OnClosing(CancelEventArgs e)
-        {
-            // setting cancel to true will cancel the close request
-            // so the application is not closed
-            e.Cancel = true;
-            this.Hide();
+        {   
+            if(!close){
+                // setting cancel to true will cancel the close request
+                // so the application is not closed
+                e.Cancel = true;
+                this.Hide();
+            }
             base.OnClosing(e);
+        }
+        private void TextBlock_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            UpdateSong();
+        }
+
+        private async void UpdateSong()
+        {
+            var details = await GetSongDetails();
+            OutputText(details);
+            // this was so easy. It was as easy as I assumed it was. I was asking the wrong questions.
+            // I want to scream.
+            this.Dispatcher.Invoke(() =>
+            {
+                this.NowPlayingText.Text = details;
+                this.ni.Text = details;
+            });
         }
 
         //Asyncronously gets the songs details from the w10 media manager
@@ -76,47 +145,6 @@ namespace NowPlaying
             {
                 return err.Message;
             }
-        }
-
-        private void TextBlock_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            UpdateSong();
-        }
-
-        //On application load set up the media listener to detect the song being changed.
-        private async void TextBlock_Loaded(object sender, RoutedEventArgs e)
-        {
-            sessionManager = await MediaManager.RequestAsync();
-            currentSession = sessionManager.GetCurrentSession();
-
-            System.Windows.Forms.NotifyIcon ni = new System.Windows.Forms.NotifyIcon();
-            ni.Icon = Properties.Resources.appicon;
-            ni.Visible = true;
-            ni.Text = "hello";
-            ni.DoubleClick +=
-                delegate (object sender, EventArgs args)
-                {
-                    Show();
-                    WindowState = System.Windows.WindowState.Normal;
-                };
-
-            currentSession.MediaPropertiesChanged += (GlobalSystemMediaTransportControlsSession s, MediaPropertiesChangedEventArgs e) =>
-            {
-                UpdateSong();
-            };
-            UpdateSong();
-        }
-
-        private async void UpdateSong()
-        {
-            var details = await GetSongDetails();
-            OutputText(details);
-            // this was so easy. It was as easy as I assumed it was. I was asking the wrong questions.
-            // I want to scream.
-            this.Dispatcher.Invoke(() =>
-            {
-                this.NowPlayingText.Text = details;
-            });
         }
 
         private async void OutputText( string text )
