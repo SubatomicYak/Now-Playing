@@ -142,6 +142,7 @@ namespace NowPlaying
                 if (currentSession is object)
                 {
                     var info = await currentSession.TryGetMediaPropertiesAsync();
+
                     return $"🎵: {info?.Title}\n🎤: {info?.Artist}";
                 }
                 return "🎵:\n🎤:";
@@ -154,10 +155,13 @@ namespace NowPlaying
 
         private async void OutputText( string text )
         {
-            string[] output = {
-                text
-            };
-            await File.WriteAllLinesAsync(Properties.Settings.Default.filePath, output );
+            if (Properties.Settings.Default.willSaveFile)
+            {
+                string[] output = {
+                    text
+                };
+                await File.WriteAllLinesAsync(Properties.Settings.Default.filePath, output );
+            }
         }
 
         private void FilePath_TextChanged(object sender, TextChangedEventArgs e)
@@ -180,6 +184,16 @@ namespace NowPlaying
         private void FilePath_Loaded(object sender, RoutedEventArgs e)
         {
             this.FilePath.Text = Properties.Settings.Default.filePath;
+        }
+
+        private void WillSaveFile_Checked(object sender, RoutedEventArgs e)
+        {
+            Properties.Settings.Default.willSaveFile = (this.WillSaveFile.IsChecked == true);
+        }
+
+        private void WillSaveFile_Loaded(object sender, RoutedEventArgs e)
+        {
+            this.WillSaveFile.IsChecked = Properties.Settings.Default.willSaveFile;
         }
     }
 }

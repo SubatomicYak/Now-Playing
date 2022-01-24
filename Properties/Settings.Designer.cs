@@ -34,5 +34,17 @@ namespace NowPlaying.Properties {
                 this["filePath"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool willSaveFile {
+            get {
+                return ((bool)(this["willSaveFile"]));
+            }
+            set {
+                this["willSaveFile"] = value;
+            }
+        }
     }
 }
