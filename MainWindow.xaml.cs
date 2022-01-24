@@ -166,25 +166,4 @@ namespace NowPlaying
             await File.WriteAllLinesAsync("nowplaying.txt", output );
         }
     }
-
-    //is this even necessary still?
-    public class Song : DependencyObject
-    {
-        public Song() { }
-        public Song(string song)
-        {
-            SongDetails = song;
-        }
-        public string SongDetails
-        {
-            get { return (string)GetValue(SongDetailsProperty); }
-            set { 
-                SetValue(SongDetailsProperty, value);
-            }
-        }
-
-        public static readonly DependencyProperty SongDetailsProperty =
-            DependencyProperty.Register("SongDetails", typeof(string),
-            typeof(Song), new PropertyMetadata("Now Playing"));
-    }
 }
