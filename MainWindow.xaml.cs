@@ -37,6 +37,8 @@ namespace NowPlaying
         private ContextMenuStrip contextMenu;
         private MenuStrip menuStrip;
 
+        private String filePath = "Songs.txt";
+
         private Boolean close = false;
         public MainWindow()
         {
@@ -155,7 +157,29 @@ namespace NowPlaying
             string[] output = {
                 text
             };
-            await File.WriteAllLinesAsync("nowplaying.txt", output );
+            await File.WriteAllLinesAsync(Properties.Settings.Default.filePath, output );
+        }
+
+        private void FilePath_TextChanged(object sender, TextChangedEventArgs e)
+        {
+        }
+
+        private void SaveFilePath_Click(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Filter = "txt files(*.txt)| *.txt";
+            saveFileDialog.InitialDirectory = Properties.Settings.Default.filePath;
+
+            if (saveFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK) {
+                this.FilePath.Text = saveFileDialog.FileName;
+                Properties.Settings.Default.filePath = saveFileDialog.FileName;
+                Properties.Settings.Default.Save();
+            }
+        }
+
+        private void FilePath_Loaded(object sender, RoutedEventArgs e)
+        {
+            this.FilePath.Text = Properties.Settings.Default.filePath;
         }
     }
 }

@@ -22,5 +22,17 @@ namespace NowPlaying.Properties {
                 return defaultInstance;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("nowplaying.txt")]
+        public string filePath {
+            get {
+                return ((string)(this["filePath"]));
+            }
+            set {
+                this["filePath"] = value;
+            }
+        }
     }
 }

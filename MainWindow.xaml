@@ -1,17 +1,22 @@
-﻿<Window x:Class="NowPlaying.MainWindow"
+﻿<Window x:Name="NowPlayingWindow" x:Class="NowPlaying.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:NowPlaying"
         mc:Ignorable="d"
-        Title="Now Playing" Height="110" Width="250">
+        Title="Now Playing" Height="130" Width="250" Background="White">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="51*"/>
-            <ColumnDefinition Width="149*"/>
+            <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <TextBlock x:Name="NowPlayingText" TextWrapping="NoWrap" MouseDown="TextBlock_MouseDown" Loaded="TextBlock_Loaded" Text="Now Playing" Margin="10,10,10,21" Grid.ColumnSpan="2" TextAlignment="Left"/>
-        <Label Content="https://github.com/SubatomicYak/Now-Playing" MouseDown="Branding_MouseDown" Grid.ColumnSpan="2" FontSize="8" Foreground="#FFA6A6A6" Cursor="Hand" Height="21" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="185"/>
+        <TextBlock x:Name="NowPlayingText" TextWrapping="NoWrap" MouseDown="TextBlock_MouseDown" Loaded="TextBlock_Loaded" Text="🎵: Now Playing" Margin="5,10,10,46" TextAlignment="Left" Panel.ZIndex="1" Cursor="Hand">
+            <TextBlock.ToolTip>
+                <TextBlock>Refresh Now Playing</TextBlock>
+            </TextBlock.ToolTip>
+        </TextBlock>
+        <Label x:Name="Branding" Content="https://github.com/SubatomicYak/Now-Playing" MouseDown="Branding_MouseDown" FontSize="8" Foreground="#FFA6A6A6" Cursor="Hand" HorizontalAlignment="Left" Width="185" Height="21" VerticalAlignment="Bottom"/>
+        <TextBox x:Name="FilePath" Margin="5,0,45,21" Text="File Path" TextWrapping="Wrap" TextChanged="FilePath_TextChanged" Loaded="FilePath_Loaded" Height="20" VerticalAlignment="Bottom"/>
+        <Button x:Name="SaveFilePath" Content="Save" Margin="0,0,10,21" Click="SaveFilePath_Click" HorizontalAlignment="Right" Width="30" Height="20" VerticalAlignment="Bottom"/>
     </Grid>
 </Window>
