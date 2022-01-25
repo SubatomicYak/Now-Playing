@@ -35,9 +35,6 @@ namespace NowPlaying
 
         private NotifyIcon ni;
         private ContextMenuStrip contextMenu;
-        private MenuStrip menuStrip;
-
-        private String filePath = "Songs.txt";
 
         private Boolean close = false;
         public MainWindow()
@@ -98,9 +95,8 @@ namespace NowPlaying
         // Minimize to system tray when application is closed.
         protected override void OnClosing(CancelEventArgs e)
         {   
+            // if the application is closed not from the right-click menu hide it instead
             if(!close){
-                // setting cancel to true will cancel the close request
-                // so the application is not closed
                 e.Cancel = true;
                 this.Hide();
             }
@@ -125,8 +121,7 @@ namespace NowPlaying
         {
             var details = await GetSongDetails();
             OutputText(details);
-            // this was so easy. It was as easy as I assumed it was. I was asking the wrong questions.
-            // I want to scream.
+            //  asyncronusly update the song details
             this.Dispatcher.Invoke(() =>
             {
                 this.NowPlayingText.Text = details;
