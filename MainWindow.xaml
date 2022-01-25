@@ -17,7 +17,7 @@
         </TextBlock>
         <Label x:Name="Branding" Content="https://github.com/SubatomicYak/Now-Playing" MouseDown="Branding_MouseDown" FontSize="8" Foreground="#FFA6A6A6" Cursor="Hand" HorizontalAlignment="Left" Width="185" Height="21" VerticalAlignment="Bottom"/>
         <TextBox x:Name="FilePath" Margin="25,0,45,21" Text="File Path" TextWrapping="Wrap" TextChanged="FilePath_TextChanged" Loaded="FilePath_Loaded" Height="20" VerticalAlignment="Bottom" IsEnabled="False"/>
-        <Button x:Name="SaveFilePath" Content="Save" Margin="0,0,10,21" Click="SaveFilePath_Click" HorizontalAlignment="Right" Width="30" Height="20" VerticalAlignment="Bottom"/>
+        <Button x:Name="SaveFilePathButton" Content="Save" Margin="0,0,10,21" Click="SaveFilePathButton_Click" HorizontalAlignment="Right" Width="30" Height="20" VerticalAlignment="Bottom" Loaded="SaveFilePathButton_Loaded"/>
         <CheckBox x:Name="WillSaveFile" Content="" HorizontalAlignment="Left" Margin="5,0,0,23" Unchecked="WillSaveFile_Checked" Checked="WillSaveFile_Checked" Loaded="WillSaveFile_Loaded" Height="15" VerticalAlignment="Bottom">
             <CheckBox.ToolTip>
                 <TextBlock>Output Now Playing to File</TextBlock>

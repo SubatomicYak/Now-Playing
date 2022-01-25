@@ -159,11 +159,33 @@ namespace NowPlaying
             }
         }
 
+        private void WillSaveFile_Loaded(object sender, RoutedEventArgs e)
+        {
+            this.WillSaveFile.IsChecked = Properties.Settings.Default.willSaveFile;
+        }
+
+        private void WillSaveFile_Checked(object sender, RoutedEventArgs e)
+        {
+            Properties.Settings.Default.willSaveFile = (this.WillSaveFile.IsChecked == true);
+            Properties.Settings.Default.Save();
+            //Is there a better way? Like binding the isEnabled state of a control to a setting?
+            this.SaveFilePathButton.IsEnabled = (this.WillSaveFile.IsChecked == true);
+        }
+
+        private void FilePath_Loaded(object sender, RoutedEventArgs e)
+        {
+            this.FilePath.Text = Properties.Settings.Default.filePath;
+        }
+
         private void FilePath_TextChanged(object sender, TextChangedEventArgs e)
         {
         }
 
-        private void SaveFilePath_Click(object sender, RoutedEventArgs e)
+        private void SaveFilePathButton_Loaded(object sender, RoutedEventArgs e)
+        {
+            this.SaveFilePathButton.IsEnabled = Properties.Settings.Default.willSaveFile;
+        }
+        private void SaveFilePathButton_Click(object sender, RoutedEventArgs e)
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog();
             saveFileDialog.Filter = "txt files(*.txt)| *.txt";
@@ -176,19 +198,5 @@ namespace NowPlaying
             }
         }
 
-        private void FilePath_Loaded(object sender, RoutedEventArgs e)
-        {
-            this.FilePath.Text = Properties.Settings.Default.filePath;
-        }
-
-        private void WillSaveFile_Checked(object sender, RoutedEventArgs e)
-        {
-            Properties.Settings.Default.willSaveFile = (this.WillSaveFile.IsChecked == true);
-        }
-
-        private void WillSaveFile_Loaded(object sender, RoutedEventArgs e)
-        {
-            this.WillSaveFile.IsChecked = Properties.Settings.Default.willSaveFile;
-        }
     }
 }
