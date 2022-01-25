@@ -168,8 +168,6 @@ namespace NowPlaying
         {
             Properties.Settings.Default.willSaveFile = (this.WillSaveFile.IsChecked == true);
             Properties.Settings.Default.Save();
-            //Is there a better way? Like binding the isEnabled state of a control to a setting?
-            this.SaveFilePathButton.IsEnabled = (this.WillSaveFile.IsChecked == true);
         }
 
         private void FilePath_Loaded(object sender, RoutedEventArgs e)
@@ -177,14 +175,6 @@ namespace NowPlaying
             this.FilePath.Text = Properties.Settings.Default.filePath;
         }
 
-        private void FilePath_TextChanged(object sender, TextChangedEventArgs e)
-        {
-        }
-
-        private void SaveFilePathButton_Loaded(object sender, RoutedEventArgs e)
-        {
-            this.SaveFilePathButton.IsEnabled = Properties.Settings.Default.willSaveFile;
-        }
         private void SaveFilePathButton_Click(object sender, RoutedEventArgs e)
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog();
