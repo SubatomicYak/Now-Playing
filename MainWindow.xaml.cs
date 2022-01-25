@@ -125,7 +125,8 @@ namespace NowPlaying
             this.Dispatcher.Invoke(() =>
             {
                 this.NowPlayingText.Text = details;
-                this.ni.Text = details;
+                //quick hack to fix the NotifyIcon limit bug. A more couth fix is needed.
+                this.ni.Text = Truncate(details, 60, "...");
             });
         }
 
@@ -146,6 +147,15 @@ namespace NowPlaying
             {
                 return err.Message;
             }
+        }
+        
+        public static string Truncate(string str, int length, string append = "")
+        {
+            if(str.Length > length)
+            {
+                return str.Substring(0, length) + append;
+            }
+            return str;
         }
 
         private async void OutputText( string text )
