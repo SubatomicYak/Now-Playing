@@ -35,7 +35,6 @@ namespace NowPlaying
 
         private NotifyIcon ni;
         private ContextMenuStrip contextMenu;
-        private MenuStrip menuStrip;
 
         private Boolean close = false;
         public MainWindow()
@@ -96,9 +95,8 @@ namespace NowPlaying
         // Minimize to system tray when application is closed.
         protected override void OnClosing(CancelEventArgs e)
         {   
+            // if the application is closed not from the right-click menu hide it instead
             if(!close){
-                // setting cancel to true will cancel the close request
-                // so the application is not closed
                 e.Cancel = true;
                 this.Hide();
             }
@@ -123,12 +121,12 @@ namespace NowPlaying
         {
             var details = await GetSongDetails();
             OutputText(details);
-            // this was so easy. It was as easy as I assumed it was. I was asking the wrong questions.
-            // I want to scream.
+            //  asyncronusly update the song details
             this.Dispatcher.Invoke(() =>
             {
                 this.NowPlayingText.Text = details;
-                this.ni.Text = details;
+                //quick hack to fix the NotifyIcon limit bug. A more couth fix is needed.
+                this.ni.Text = Truncate(details, 60, "...");
             });
         }
 
@@ -140,6 +138,7 @@ namespace NowPlaying
                 if (currentSession is object)
                 {
                     var info = await currentSession.TryGetMediaPropertiesAsync();
+
                     return $"🎵: {info?.Title}\n🎤: {info?.Artist}";
                 }
                 return "🎵:\n🎤:";
@@ -149,13 +148,55 @@ namespace NowPlaying
                 return err.Message;
             }
         }
+        
+        public static string Truncate(string str, int length, string append = "")
+        {
+            if(str.Length > length)
+            {
+                return str.Substring(0, length) + append;
+            }
+            return str;
+        }
 
         private async void OutputText( string text )
         {
-            string[] output = {
-                text
-            };
-            await File.WriteAllLinesAsync("nowplaying.txt", output );
+            if (Properties.Settings.Default.willSaveFile)
+            {
+                string[] output = {
+                    text
+                };
+                await File.WriteAllLinesAsync(Properties.Settings.Default.filePath, output );
+            }
         }
+
+        private void WillSaveFile_Loaded(object sender, RoutedEventArgs e)
+        {
+            this.WillSaveFile.IsChecked = Properties.Settings.Default.willSaveFile;
+        }
+
+        private void WillSaveFile_Checked(object sender, RoutedEventArgs e)
+        {
+            Properties.Settings.Default.willSaveFile = (this.WillSaveFile.IsChecked == true);
+            Properties.Settings.Default.Save();
+        }
+
+        private void FilePath_Loaded(object sender, RoutedEventArgs e)
+        {
+            this.FilePath.Text = Properties.Settings.Default.filePath;
+        }
+
+        private void SaveFilePathButton_Click(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Filter = "txt files(*.txt)| *.txt";
+            saveFileDialog.InitialDirectory = Properties.Settings.Default.filePath;
+
+            if (saveFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK) {
+                this.FilePath.Text = saveFileDialog.FileName;
+                Properties.Settings.Default.filePath = saveFileDialog.FileName;
+                Properties.Settings.Default.Save();
+            }
+        }
+
     }
 }
