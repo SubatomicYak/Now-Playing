@@ -36,7 +36,7 @@ namespace NowPlaying
         private NotifyIcon notifyIcon;
         private ContextMenuStrip contextMenu;
 
-        private Boolean close = false;
+        private Boolean programWillClose = false;
         public MainWindow()
         {
             InitializeComponent();
@@ -48,7 +48,7 @@ namespace NowPlaying
             item.Name = "Exit";
             item.Click += new EventHandler((obj,args)=>
             {
-                close = true;
+                programWillClose = true;
                 this.Close();
             });
             contextMenu.Items.Add(item);
@@ -78,6 +78,32 @@ namespace NowPlaying
             notifyIcon.ContextMenuStrip = contextMenu;
         }
 
+        // Minimize to system tray when application is closed.
+        protected override void OnClosing(CancelEventArgs e)
+        {   
+            // if the application is closed not from the right-click menu hide it instead
+            if(!programWillClose){
+                e.Cancel = true;
+                this.Hide();
+            }
+            base.OnClosing(e);
+        }
+
+        private void Branding_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            var destinationurl = "https://github.com/SubatomicYak/Now-Playing";
+            var sInfo = new System.Diagnostics.ProcessStartInfo(destinationurl)
+            {
+                UseShellExecute = true,
+            };
+            System.Diagnostics.Process.Start(sInfo);
+        }
+
+        private void FilePath_Loaded(object sender, RoutedEventArgs e)
+        {
+            this.FilePath.Text = Properties.Settings.Default.filePath;
+        }
+
         //On application load set up the media listener to detect the song being changed.
         private async void TextBlock_Loaded(object sender, RoutedEventArgs e)
         {
@@ -92,31 +118,35 @@ namespace NowPlaying
             UpdateSong();
         }
 
-        // Minimize to system tray when application is closed.
-        protected override void OnClosing(CancelEventArgs e)
-        {   
-            // if the application is closed not from the right-click menu hide it instead
-            if(!close){
-                e.Cancel = true;
-                this.Hide();
+        private void SaveFilePathButton_Click(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Filter = "txt files(*.txt)| *.txt";
+            saveFileDialog.InitialDirectory = Properties.Settings.Default.filePath;
+
+            if (saveFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK) {
+                this.FilePath.Text = saveFileDialog.FileName;
+                Properties.Settings.Default.filePath = saveFileDialog.FileName;
+                Properties.Settings.Default.Save();
             }
-            base.OnClosing(e);
         }
+
         private void TextBlock_MouseDown(object sender, MouseButtonEventArgs e)
         {
             UpdateSong();
         }
-
-        private void Branding_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            var destinationurl = "https://github.com/SubatomicYak/Now-Playing";
-            var sInfo = new System.Diagnostics.ProcessStartInfo(destinationurl)
-            {
-                UseShellExecute = true,
-            };
-            System.Diagnostics.Process.Start(sInfo);
-        }
         
+        private void WillSaveFile_Loaded(object sender, RoutedEventArgs e)
+        {
+            this.WillSaveFile.IsChecked = Properties.Settings.Default.willSaveFile;
+        }
+
+        private void WillSaveFile_Checked(object sender, RoutedEventArgs e)
+        {
+            Properties.Settings.Default.willSaveFile = (this.WillSaveFile.IsChecked == true);
+            Properties.Settings.Default.Save();
+        }
+
         private async void UpdateSong()
         {
             var details = await GetSongDetails();
@@ -149,15 +179,6 @@ namespace NowPlaying
             }
         }
         
-        public static string Truncate(string str, int length, string append = "")
-        {
-            if(str.Length > length)
-            {
-                return str.Substring(0, length) + append;
-            }
-            return str;
-        }
-
         private async void OutputText( string text )
         {
             if (Properties.Settings.Default.willSaveFile)
@@ -169,33 +190,13 @@ namespace NowPlaying
             }
         }
 
-        private void WillSaveFile_Loaded(object sender, RoutedEventArgs e)
+        public static string Truncate(string str, int length, string append = "")
         {
-            this.WillSaveFile.IsChecked = Properties.Settings.Default.willSaveFile;
-        }
-
-        private void WillSaveFile_Checked(object sender, RoutedEventArgs e)
-        {
-            Properties.Settings.Default.willSaveFile = (this.WillSaveFile.IsChecked == true);
-            Properties.Settings.Default.Save();
-        }
-
-        private void FilePath_Loaded(object sender, RoutedEventArgs e)
-        {
-            this.FilePath.Text = Properties.Settings.Default.filePath;
-        }
-
-        private void SaveFilePathButton_Click(object sender, RoutedEventArgs e)
-        {
-            SaveFileDialog saveFileDialog = new SaveFileDialog();
-            saveFileDialog.Filter = "txt files(*.txt)| *.txt";
-            saveFileDialog.InitialDirectory = Properties.Settings.Default.filePath;
-
-            if (saveFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK) {
-                this.FilePath.Text = saveFileDialog.FileName;
-                Properties.Settings.Default.filePath = saveFileDialog.FileName;
-                Properties.Settings.Default.Save();
+            if(str.Length > length)
+            {
+                return str.Substring(0, length) + append;
             }
+            return str;
         }
 
     }
