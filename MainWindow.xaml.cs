@@ -57,7 +57,7 @@ namespace NowPlaying
             notifyIcon.Icon = Properties.Resources.appicon;
             notifyIcon.Visible = true;
             notifyIcon.Click += (object o, EventArgs e) => {
-                System.Windows.Forms.MouseEventArgs me = (System.Windows.Forms.MouseEventArgs) e;
+                var me = (System.Windows.Forms.MouseEventArgs) e;
                 if(me.Button == System.Windows.Forms.MouseButtons.Left)
                 {
                     if(WindowState == WindowState.Minimized)
@@ -78,10 +78,9 @@ namespace NowPlaying
             notifyIcon.ContextMenuStrip = contextMenu;
         }
 
-        // Minimize to system tray when application is closed.
+        // Capture close event and check if its in tray, to do so. If not move to tray.
         protected override void OnClosing(CancelEventArgs e)
         {   
-            // if the application is closed not from the right-click menu hide it instead
             if(!programWillClose){
                 e.Cancel = true;
                 this.Hide();
@@ -104,6 +103,19 @@ namespace NowPlaying
             this.FilePath.Text = Properties.Settings.Default.filePath;
         }
 
+        private void SaveFilePathButton_Click(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Filter = "txt files(*.txt)| *.txt";
+            saveFileDialog.InitialDirectory = Properties.Settings.Default.filePath;
+
+            if (saveFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK) {
+                this.FilePath.Text = saveFileDialog.FileName;
+                Properties.Settings.Default.filePath = saveFileDialog.FileName;
+                Properties.Settings.Default.Save();
+            }
+        }
+
         //On application load set up the media listener to detect the song being changed.
         private async void TextBlock_Loaded(object sender, RoutedEventArgs e)
         {
@@ -116,19 +128,6 @@ namespace NowPlaying
                 UpdateSong();
             };
             UpdateSong();
-        }
-
-        private void SaveFilePathButton_Click(object sender, RoutedEventArgs e)
-        {
-            SaveFileDialog saveFileDialog = new SaveFileDialog();
-            saveFileDialog.Filter = "txt files(*.txt)| *.txt";
-            saveFileDialog.InitialDirectory = Properties.Settings.Default.filePath;
-
-            if (saveFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK) {
-                this.FilePath.Text = saveFileDialog.FileName;
-                Properties.Settings.Default.filePath = saveFileDialog.FileName;
-                Properties.Settings.Default.Save();
-            }
         }
 
         private void TextBlock_MouseDown(object sender, MouseButtonEventArgs e)
