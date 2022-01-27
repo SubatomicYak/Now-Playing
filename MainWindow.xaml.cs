@@ -33,23 +33,16 @@ namespace NowPlaying
         private MediaSession currentSession;
         private MediaManager sessionManager;
 
-        private NotifyIcon ni;
+        private NotifyIcon notifyIcon;
         private ContextMenuStrip contextMenu;
 
         private Boolean close = false;
         public MainWindow()
         {
             InitializeComponent();
-        }
-
-        //On application load set up the media listener to detect the song being changed.
-        private async void TextBlock_Loaded(object sender, RoutedEventArgs e)
-        {
-            sessionManager = await MediaManager.RequestAsync();
-            currentSession = sessionManager.GetCurrentSession();
 
             // Create Context Menu for the Notification Icon
-            this.contextMenu = new ContextMenuStrip();
+            contextMenu = new ContextMenuStrip();
 
             ToolStripMenuItem item = new ToolStripMenuItem("Exit");
             item.Name = "Exit";
@@ -60,10 +53,10 @@ namespace NowPlaying
             });
             contextMenu.Items.Add(item);
 
-            ni = new System.Windows.Forms.NotifyIcon();
-            ni.Icon = Properties.Resources.appicon;
-            ni.Visible = true;
-            this.ni.Click += (object o, EventArgs e) => {
+            notifyIcon = new System.Windows.Forms.NotifyIcon();
+            notifyIcon.Icon = Properties.Resources.appicon;
+            notifyIcon.Visible = true;
+            notifyIcon.Click += (object o, EventArgs e) => {
                 System.Windows.Forms.MouseEventArgs me = (System.Windows.Forms.MouseEventArgs) e;
                 if(me.Button == System.Windows.Forms.MouseButtons.Left)
                 {
@@ -82,9 +75,16 @@ namespace NowPlaying
                     contextMenu.Show();
                 }
             };
-            ni.ContextMenuStrip = contextMenu;
+            notifyIcon.ContextMenuStrip = contextMenu;
+        }
 
-            // Create media listener
+        //On application load set up the media listener to detect the song being changed.
+        private async void TextBlock_Loaded(object sender, RoutedEventArgs e)
+        {
+            // Initialize mediamanagers and create listeners
+            sessionManager = await MediaManager.RequestAsync();
+            currentSession = sessionManager.GetCurrentSession();
+
             currentSession.MediaPropertiesChanged += (GlobalSystemMediaTransportControlsSession s, MediaPropertiesChangedEventArgs e) =>
             {
                 UpdateSong();
@@ -126,7 +126,7 @@ namespace NowPlaying
             {
                 this.NowPlayingText.Text = details;
                 //quick hack to fix the NotifyIcon limit bug. A more couth fix is needed.
-                this.ni.Text = Truncate(details, 60, "...");
+                notifyIcon.Text = Truncate(details, 60, "...");
             });
         }
 
