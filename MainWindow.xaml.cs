@@ -19,17 +19,15 @@ using System.Windows.Forms;
 using Windows.Media.Control;
 using MediaManager = Windows.Media.Control.GlobalSystemMediaTransportControlsSessionManager;
 using MediaSession = Windows.Media.Control.GlobalSystemMediaTransportControlsSession;
-using TransportManager = Windows.Media.Control.GlobalSystemMediaTransportControlsSession;
 
 
 namespace NowPlaying
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Main window of the application. Displays Now Playing information, while also outputting it to file.
     /// </summary>
     public partial class MainWindow : Window
     {
-        // TODO: Cleanup
         private MediaSession currentSession;
         private MediaManager sessionManager;
 
