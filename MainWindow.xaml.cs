@@ -19,52 +19,43 @@ using System.Windows.Forms;
 using Windows.Media.Control;
 using MediaManager = Windows.Media.Control.GlobalSystemMediaTransportControlsSessionManager;
 using MediaSession = Windows.Media.Control.GlobalSystemMediaTransportControlsSession;
-using TransportManager = Windows.Media.Control.GlobalSystemMediaTransportControlsSession;
 
 
 namespace NowPlaying
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Main window of the application. Displays Now Playing information, while also outputting it to file.
     /// </summary>
     public partial class MainWindow : Window
     {
-        // TODO: Cleanup
         private MediaSession currentSession;
         private MediaManager sessionManager;
 
-        private NotifyIcon ni;
+        private NotifyIcon notifyIcon;
         private ContextMenuStrip contextMenu;
 
-        private Boolean close = false;
+        private Boolean programWillClose = false;
         public MainWindow()
         {
             InitializeComponent();
-        }
-
-        //On application load set up the media listener to detect the song being changed.
-        private async void TextBlock_Loaded(object sender, RoutedEventArgs e)
-        {
-            sessionManager = await MediaManager.RequestAsync();
-            currentSession = sessionManager.GetCurrentSession();
 
             // Create Context Menu for the Notification Icon
-            this.contextMenu = new ContextMenuStrip();
+            contextMenu = new ContextMenuStrip();
 
             ToolStripMenuItem item = new ToolStripMenuItem("Exit");
             item.Name = "Exit";
             item.Click += new EventHandler((obj,args)=>
             {
-                close = true;
+                programWillClose = true;
                 this.Close();
             });
             contextMenu.Items.Add(item);
 
-            ni = new System.Windows.Forms.NotifyIcon();
-            ni.Icon = Properties.Resources.appicon;
-            ni.Visible = true;
-            this.ni.Click += (object o, EventArgs e) => {
-                System.Windows.Forms.MouseEventArgs me = (System.Windows.Forms.MouseEventArgs) e;
+            notifyIcon = new System.Windows.Forms.NotifyIcon();
+            notifyIcon.Icon = Properties.Resources.appicon;
+            notifyIcon.Visible = true;
+            notifyIcon.Click += (object o, EventArgs e) => {
+                var me = (System.Windows.Forms.MouseEventArgs) e;
                 if(me.Button == System.Windows.Forms.MouseButtons.Left)
                 {
                     if(WindowState == WindowState.Minimized)
@@ -82,29 +73,17 @@ namespace NowPlaying
                     contextMenu.Show();
                 }
             };
-            ni.ContextMenuStrip = contextMenu;
-
-            // Create media listener
-            currentSession.MediaPropertiesChanged += (GlobalSystemMediaTransportControlsSession s, MediaPropertiesChangedEventArgs e) =>
-            {
-                UpdateSong();
-            };
-            UpdateSong();
+            notifyIcon.ContextMenuStrip = contextMenu;
         }
 
-        // Minimize to system tray when application is closed.
+        // Capture close event and check if its in tray, to do so. If not move to tray.
         protected override void OnClosing(CancelEventArgs e)
         {   
-            // if the application is closed not from the right-click menu hide it instead
-            if(!close){
+            if(!programWillClose){
                 e.Cancel = true;
                 this.Hide();
             }
             base.OnClosing(e);
-        }
-        private void TextBlock_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            UpdateSong();
         }
 
         private void Branding_MouseDown(object sender, MouseButtonEventArgs e)
@@ -116,7 +95,55 @@ namespace NowPlaying
             };
             System.Diagnostics.Process.Start(sInfo);
         }
+
+        private void FilePath_Loaded(object sender, RoutedEventArgs e)
+        {
+            this.FilePath.Text = Properties.Settings.Default.filePath;
+        }
+
+        private void SaveFilePathButton_Click(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Filter = "txt files(*.txt)| *.txt";
+            saveFileDialog.InitialDirectory = Properties.Settings.Default.filePath;
+
+            if (saveFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK) {
+                this.FilePath.Text = saveFileDialog.FileName;
+                Properties.Settings.Default.filePath = saveFileDialog.FileName;
+                Properties.Settings.Default.Save();
+            }
+        }
+
+        //On application load set up the media listener to detect the song being changed.
+        private async void TextBlock_Loaded(object sender, RoutedEventArgs e)
+        {
+            // Initialize mediamanagers and create listeners
+            sessionManager = await MediaManager.RequestAsync();
+            currentSession = sessionManager.GetCurrentSession();
+
+            currentSession.MediaPropertiesChanged += (GlobalSystemMediaTransportControlsSession s, MediaPropertiesChangedEventArgs e) =>
+            {
+                UpdateSong();
+            };
+            UpdateSong();
+        }
+
+        private void TextBlock_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            UpdateSong();
+        }
         
+        private void WillSaveFile_Loaded(object sender, RoutedEventArgs e)
+        {
+            this.WillSaveFile.IsChecked = Properties.Settings.Default.willSaveFile;
+        }
+
+        private void WillSaveFile_Checked(object sender, RoutedEventArgs e)
+        {
+            Properties.Settings.Default.willSaveFile = (this.WillSaveFile.IsChecked == true);
+            Properties.Settings.Default.Save();
+        }
+
         private async void UpdateSong()
         {
             var details = await GetSongDetails();
@@ -126,7 +153,7 @@ namespace NowPlaying
             {
                 this.NowPlayingText.Text = details;
                 //quick hack to fix the NotifyIcon limit bug. A more couth fix is needed.
-                this.ni.Text = Truncate(details, 60, "...");
+                notifyIcon.Text = Truncate(details, 60, "...");
             });
         }
 
@@ -149,15 +176,6 @@ namespace NowPlaying
             }
         }
         
-        public static string Truncate(string str, int length, string append = "")
-        {
-            if(str.Length > length)
-            {
-                return str.Substring(0, length) + append;
-            }
-            return str;
-        }
-
         private async void OutputText( string text )
         {
             if (Properties.Settings.Default.willSaveFile)
@@ -169,33 +187,13 @@ namespace NowPlaying
             }
         }
 
-        private void WillSaveFile_Loaded(object sender, RoutedEventArgs e)
+        public static string Truncate(string str, int length, string append = "")
         {
-            this.WillSaveFile.IsChecked = Properties.Settings.Default.willSaveFile;
-        }
-
-        private void WillSaveFile_Checked(object sender, RoutedEventArgs e)
-        {
-            Properties.Settings.Default.willSaveFile = (this.WillSaveFile.IsChecked == true);
-            Properties.Settings.Default.Save();
-        }
-
-        private void FilePath_Loaded(object sender, RoutedEventArgs e)
-        {
-            this.FilePath.Text = Properties.Settings.Default.filePath;
-        }
-
-        private void SaveFilePathButton_Click(object sender, RoutedEventArgs e)
-        {
-            SaveFileDialog saveFileDialog = new SaveFileDialog();
-            saveFileDialog.Filter = "txt files(*.txt)| *.txt";
-            saveFileDialog.InitialDirectory = Properties.Settings.Default.filePath;
-
-            if (saveFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK) {
-                this.FilePath.Text = saveFileDialog.FileName;
-                Properties.Settings.Default.filePath = saveFileDialog.FileName;
-                Properties.Settings.Default.Save();
+            if(str.Length > length)
+            {
+                return str.Substring(0, length) + append;
             }
+            return str;
         }
 
     }
