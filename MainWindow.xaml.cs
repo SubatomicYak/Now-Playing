@@ -85,8 +85,10 @@ namespace NowPlaying
             if(!programWillClose){
                 e.Cancel = true;
                 this.Hide();
+            }else{
+                notifyIcon.Icon = null;
+                base.OnClosing(e);
             }
-            base.OnClosing(e);
         }
 
         private void Branding_MouseDown(object sender, MouseButtonEventArgs e)
