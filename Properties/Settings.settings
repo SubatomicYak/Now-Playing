@@ -8,5 +8,9 @@
     <Setting Name="willSaveFile" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
+    <Setting Name="fileOutput" Type="System.String" Scope="User">
+      <Value Profile="(Default)">🎵: ${title}
+🎤: ${artist}</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

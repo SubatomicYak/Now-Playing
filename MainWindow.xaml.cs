@@ -17,6 +17,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Forms;
 using Windows.Media.Control;
+using System.Text.RegularExpressions;
 using MediaManager = Windows.Media.Control.GlobalSystemMediaTransportControlsSessionManager;
 using MediaSession = Windows.Media.Control.GlobalSystemMediaTransportControlsSession;
 
@@ -33,6 +34,8 @@ namespace NowPlaying
 
         private NotifyIcon notifyIcon;
         private ContextMenuStrip contextMenu;
+
+        private SettingsWindow settingsWindow;
 
         private Boolean programWillClose = false;
         public MainWindow()
@@ -95,23 +98,18 @@ namespace NowPlaying
             };
             System.Diagnostics.Process.Start(sInfo);
         }
-
-        private void FilePath_Loaded(object sender, RoutedEventArgs e)
+        private void SettingsButton_Click(object sender, RoutedEventArgs e)
         {
-            this.FilePath.Text = Properties.Settings.Default.filePath;
-        }
-
-        private void SaveFilePathButton_Click(object sender, RoutedEventArgs e)
-        {
-            SaveFileDialog saveFileDialog = new SaveFileDialog();
-            saveFileDialog.Filter = "txt files(*.txt)| *.txt";
-            saveFileDialog.InitialDirectory = Properties.Settings.Default.filePath;
-
-            if (saveFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK) {
-                this.FilePath.Text = saveFileDialog.FileName;
-                Properties.Settings.Default.filePath = saveFileDialog.FileName;
-                Properties.Settings.Default.Save();
+            if( settingsWindow is null || !settingsWindow.IsLoaded )
+            {
+                settingsWindow = new SettingsWindow();
+                settingsWindow.ShowDialog();
+            } else
+            {
+                settingsWindow.ShowDialog();
+                settingsWindow.Focus();
             }
+            UpdateSong();
         }
 
         //On application load set up the media listener to detect the song being changed.
@@ -133,17 +131,6 @@ namespace NowPlaying
             UpdateSong();
         }
         
-        private void WillSaveFile_Loaded(object sender, RoutedEventArgs e)
-        {
-            this.WillSaveFile.IsChecked = Properties.Settings.Default.willSaveFile;
-        }
-
-        private void WillSaveFile_Checked(object sender, RoutedEventArgs e)
-        {
-            Properties.Settings.Default.willSaveFile = (this.WillSaveFile.IsChecked == true);
-            Properties.Settings.Default.Save();
-        }
-
         private async void UpdateSong()
         {
             var details = await GetSongDetails();
@@ -165,10 +152,50 @@ namespace NowPlaying
                 if (currentSession is object)
                 {
                     var info = await currentSession.TryGetMediaPropertiesAsync();
-
-                    return $"🎵: {info?.Title}\n🎤: {info?.Artist}";
+                    string[] properties = new string[]{"AlbumArtist", "AlbumTitle", "AlbumTrackCount", "Artist" , "Genres", "PlaybackType", "Subtitle", "Thumbnail", "Title", "TrackNumber"};
+                    string output = Properties.Settings.Default.fileOutput;
+                    //TODO: PLEASE find a better way to do this
+                    foreach (string prop in properties)
+                    {
+                        string propOut = "";
+                        switch(prop)
+                        {
+                            case "AlbumArtist":
+                                propOut = info.AlbumArtist;
+                                break;
+                            case "AlbumTrackCount":
+                                propOut = $"{info.AlbumTrackCount}";
+                                break;
+                            case "AlbumTitle":
+                                propOut = info.AlbumTitle;
+                                break;
+                            case "Artist":
+                                propOut = info.Artist;
+                                break;
+                            case "Genres":
+                                foreach (string genre in info.Genres)
+                                {
+                                    propOut += $"{genre},";
+                                }
+                                break;
+                            case "PlaybackType":
+                                propOut = info.PlaybackType.ToString();
+                                break;
+                            case "Subtitle":
+                                propOut = info.Subtitle;
+                                break;
+                            case "Title":
+                                propOut = info.Title;
+                                break;
+                            case "TrackNumber":
+                                propOut = info.TrackNumber.ToString();
+                                break;
+                        }
+                        output = Regex.Replace(output, @"\$\{"+ prop + @"\}", propOut);
+                    }
+                    return output;
                 }
-                return "🎵:\n🎤:";
+                return "No Media Session Found";
             }
             catch (Exception err)
             {

@@ -1,0 +1,42 @@
+﻿<Window x:Class="NowPlaying.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:NowPlaying"
+        mc:Ignorable="d"
+        Title="Settings" Height="237" Width="285">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <CheckBox x:Name="WillSaveFile" Content="" HorizontalAlignment="Left" Margin="10,37,0,0" Unchecked="WillSaveFile_Checked" Checked="WillSaveFile_Checked" Loaded="WillSaveFile_Loaded" Height="15" VerticalAlignment="Top">
+            <CheckBox.ToolTip>
+                <TextBlock><Run Text="Output Now Playing to File"/></TextBlock>
+            </CheckBox.ToolTip>
+        </CheckBox>
+        <TextBox x:Name="FilePath" Margin="30,34,60,0" Text="File Path" TextWrapping="Wrap" Loaded="FilePath_Loaded" Height="20" VerticalAlignment="Top"
+            IsEnabled="{Binding IsChecked, ElementName=WillSaveFile, TargetNullValue=false}"       
+        />
+        <Button x:Name="SaveFilePathButton" Content="Browse" Margin="0,34,10,0" Click="SaveFilePathButton_Click" HorizontalAlignment="Right" Width="45"
+            IsEnabled="{Binding IsChecked, ElementName=WillSaveFile, TargetNullValue=false}" Height="20" VerticalAlignment="Top"        
+        />
+        <Label Content="File Location" HorizontalAlignment="Left" Height="24" Margin="10,5,0,0" VerticalAlignment="Top" Width="98"/>
+        <Label Content="File Output" HorizontalAlignment="Left" Height="24" Margin="10,59,0,0" VerticalAlignment="Top" Width="113"/>
+        <TextBox x:Name="OutputTextbox" Margin="10,88,10,39" TextWrapping="Wrap" TextChanged="OutputTextbox_TextChanged" AcceptsReturn="True" VerticalScrollBarVisibility="Auto"/>
+        <Button x:Name="OkButton" Content="Ok" Margin="0,0,10,10" Click="OkButton_Click" Height="24" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="45"/>
+        <Button x:Name="ApplyButton" Content="Apply" Margin="0,0,60,10" Click="ApplyButton_Click" HorizontalAlignment="Right" Width="45" Height="24" VerticalAlignment="Bottom"/>
+        <Button x:Name="CancelButton" Content="Cancel" HorizontalAlignment="Left" Margin="10,0,0,10" Width="45" Click="CancelButton_Click" Height="24" VerticalAlignment="Bottom"/>
+        <ComboBox x:Name="MediaPropertiesComboBox" Margin="0,63,10,0" SelectionChanged="MediaPropertiesComboBox_SelectionChanged" HorizontalAlignment="Right" Width="152" Height="20" VerticalAlignment="Top" Text="Insert Properties">
+            <ComboBoxItem Content="AlbumArtist"/>
+            <ComboBoxItem Content="AlbumTitle"/>
+            <ComboBoxItem Content="AlbumTrackCount"/>
+            <ComboBoxItem Content="Artist"/>
+            <ComboBoxItem Content="Genres"/>
+            <ComboBoxItem Content="PlaybackType"/>
+            <ComboBoxItem Content="Subtitle"/>
+            <ComboBoxItem Content="Title"/>
+            <ComboBoxItem Content="TrackNumber"/>
+        </ComboBox>
+    </Grid>
+</Window>

@@ -46,5 +46,17 @@ namespace NowPlaying.Properties {
                 this["willSaveFile"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("🎵: ${title}\n🎤: ${artist}")]
+        public string fileOutput {
+            get {
+                return ((string)(this["fileOutput"]));
+            }
+            set {
+                this["fileOutput"] = value;
+            }
+        }
     }
 }
