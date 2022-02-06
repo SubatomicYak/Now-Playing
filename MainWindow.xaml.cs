@@ -235,6 +235,10 @@ namespace NowPlaying
                     }
                     return output;
                 }
+                else if( Properties.Settings.Default.fileOutputClearIfPaused )
+                {
+                    return "";
+                }
                 return "No Media Session Found";
             }
             catch (Exception err)
