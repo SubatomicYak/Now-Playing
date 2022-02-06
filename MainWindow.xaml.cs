@@ -121,7 +121,13 @@ namespace NowPlaying
             sessionManager = await MediaManager.RequestAsync();
             currentSession = sessionManager.GetCurrentSession();
 
+            // Listener for media changing (change track)
             currentSession.MediaPropertiesChanged += (GlobalSystemMediaTransportControlsSession s, MediaPropertiesChangedEventArgs e) =>
+            {
+                UpdateSong();
+            };
+            // Listener for media playback changing (play/pause)
+            currentSession.PlaybackInfoChanged += (GlobalSystemMediaTransportControlsSession s, PlaybackInfoChangedEventArgs e) =>
             {
                 UpdateSong();
             };
@@ -154,7 +160,12 @@ namespace NowPlaying
                 if (currentSession is object)
                 {
                     var info = await currentSession.TryGetMediaPropertiesAsync();
-                    string[] properties = new string[]{"AlbumArtist", "AlbumTitle", "AlbumTrackCount", "Artist" , "Genres", "PlaybackType", "Subtitle", "Thumbnail", "Title", "TrackNumber"};
+                    var playback = currentSession.GetPlaybackInfo();
+                    if( Properties.Settings.Default.fileOutputClearIfPaused && playback.PlaybackStatus == GlobalSystemMediaTransportControlsSessionPlaybackStatus.Paused)
+                    {
+                        return "";
+                    }
+                    string[] properties = new string[]{"AlbumArtist", "AlbumTitle", "AlbumTrackCount", "Artist" , "Genres", "PlayStatus", "PlaybackType", "Subtitle", "Thumbnail", "Title", "TrackNumber"};
                     string output = Properties.Settings.Default.fileOutput;
                     //TODO: PLEASE find a better way to do this
                     foreach (string prop in properties)
@@ -178,6 +189,33 @@ namespace NowPlaying
                                 foreach (string genre in info.Genres)
                                 {
                                     propOut += $"{genre},";
+                                }
+                                break;
+                            case "PlayStatus":
+                                propOut = playback.PlaybackStatus.ToString();
+                                if( Properties.Settings.Default.fileOutputPlaybackAsEmoji )
+                                {
+                                    switch(playback.PlaybackStatus)
+                                    {
+                                        case GlobalSystemMediaTransportControlsSessionPlaybackStatus.Changing:
+                                            propOut = "🔄";
+                                            break;
+                                        case GlobalSystemMediaTransportControlsSessionPlaybackStatus.Closed:
+                                            propOut = "❎";
+                                            break;
+                                        case GlobalSystemMediaTransportControlsSessionPlaybackStatus.Opened:
+                                            propOut = "⏯";
+                                            break;
+                                        case GlobalSystemMediaTransportControlsSessionPlaybackStatus.Paused:
+                                            propOut = "⏸";
+                                            break;
+                                        case GlobalSystemMediaTransportControlsSessionPlaybackStatus.Playing:
+                                            propOut = "▶";
+                                            break;
+                                        case GlobalSystemMediaTransportControlsSessionPlaybackStatus.Stopped:
+                                            propOut = "⏹";
+                                            break;
+                                    }
                                 }
                                 break;
                             case "PlaybackType":

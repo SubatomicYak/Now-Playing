@@ -3,9 +3,10 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:p="clr-namespace:NowPlaying.Properties"
         xmlns:local="clr-namespace:NowPlaying"
         mc:Ignorable="d"
-        Title="Settings" Height="237" Width="285">
+        Title="Settings" Height="303" Width="285">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
@@ -23,7 +24,7 @@
         />
         <Label Content="File Location" HorizontalAlignment="Left" Height="24" Margin="10,5,0,0" VerticalAlignment="Top" Width="98"/>
         <Label Content="File Output" HorizontalAlignment="Left" Height="24" Margin="10,59,0,0" VerticalAlignment="Top" Width="113"/>
-        <TextBox x:Name="OutputTextbox" Margin="10,88,10,39" TextWrapping="Wrap" TextChanged="OutputTextbox_TextChanged" AcceptsReturn="True" VerticalScrollBarVisibility="Auto"/>
+        <TextBox x:Name="OutputTextbox" Margin="10,88,10,102" TextWrapping="Wrap" TextChanged="OutputTextbox_TextChanged" AcceptsReturn="True" VerticalScrollBarVisibility="Auto"/>
         <Button x:Name="OkButton" Content="Ok" Margin="0,0,10,10" Click="OkButton_Click" Height="24" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="45"/>
         <Button x:Name="ApplyButton" Content="Apply" Margin="0,0,60,10" Click="ApplyButton_Click" HorizontalAlignment="Right" Width="45" Height="24" VerticalAlignment="Bottom"/>
         <Button x:Name="CancelButton" Content="Cancel" HorizontalAlignment="Left" Margin="10,0,0,10" Width="45" Click="CancelButton_Click" Height="24" VerticalAlignment="Bottom"/>
@@ -32,11 +33,23 @@
             <ComboBoxItem Content="AlbumTitle"/>
             <ComboBoxItem Content="AlbumTrackCount"/>
             <ComboBoxItem Content="Artist"/>
-            <ComboBoxItem Content="Genres"/>
+            <ComboBoxItem Content="PlayStatus"/>
             <ComboBoxItem Content="PlaybackType"/>
             <ComboBoxItem Content="Subtitle"/>
             <ComboBoxItem Content="Title"/>
             <ComboBoxItem Content="TrackNumber"/>
         </ComboBox>
+        <CheckBox x:Name="FileOutputPlaybackAsEmoji" Content="Play Status as Emoji" HorizontalAlignment="Left" Margin="10,0,0,82" Height="15" VerticalAlignment="Bottom"
+             IsChecked="{Binding fileOutputPlaybackAsEmoji, 
+                Mode=TwoWay, 
+                Source={x:Static p:Settings.Default}, 
+                UpdateSourceTrigger=PropertyChanged}"         
+        />
+        <CheckBox x:Name="FileOutputClearIfPaused" Content="Clear Output if no Media" HorizontalAlignment="Left" Margin="10,0,0,62" Height="15" VerticalAlignment="Bottom"
+            IsChecked="{Binding fileOutputClearIfPaused, 
+                Mode=TwoWay, 
+                Source={x:Static p:Settings.Default}, 
+                UpdateSourceTrigger=PropertyChanged}"
+        />
     </Grid>
 </Window>

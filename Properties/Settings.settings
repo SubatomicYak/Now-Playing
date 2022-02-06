@@ -9,8 +9,14 @@
       <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="fileOutput" Type="System.String" Scope="User">
-      <Value Profile="(Default)">🎵: ${title}
-🎤: ${artist}</Value>
+      <Value Profile="(Default)">🎵: ${Title}
+🎤: ${AlbumArtist}</Value>
+    </Setting>
+    <Setting Name="fileOutputPlaybackAsEmoji" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="fileOutputClearIfPaused" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
     </Setting>
   </Settings>
 </SettingsFile>

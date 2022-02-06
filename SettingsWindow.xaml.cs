@@ -112,6 +112,5 @@ namespace NowPlaying
             Properties.Settings.Default.Save();
             return true;
         }
-
     }
 }

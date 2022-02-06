@@ -49,13 +49,37 @@ namespace NowPlaying.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("🎵: ${title}\n🎤: ${artist}")]
+        [global::System.Configuration.DefaultSettingValueAttribute("🎵: ${Title}\n🎤: ${AlbumArtist}")]
         public string fileOutput {
             get {
                 return ((string)(this["fileOutput"]));
             }
             set {
                 this["fileOutput"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool fileOutputPlaybackAsEmoji {
+            get {
+                return ((bool)(this["fileOutputPlaybackAsEmoji"]));
+            }
+            set {
+                this["fileOutputPlaybackAsEmoji"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool fileOutputClearIfPaused {
+            get {
+                return ((bool)(this["fileOutputClearIfPaused"]));
+            }
+            set {
+                this["fileOutputClearIfPaused"] = value;
             }
         }
     }
